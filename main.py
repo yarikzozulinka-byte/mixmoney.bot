@@ -186,9 +186,24 @@ async def process_withdraw(callback: types.CallbackQuery):
 async def process_roulette(callback: types.CallbackQuery):
     await callback.answer("🎰 Модуль рулетки в розробці!", show_alert=True)
 
+async def handle(request):
+    from aiohttp import web
+    return web.Response(text="MixMoney Bot is running!")
+
+async def web_server():
+    from aiohttp import web
+    app = web.Application()
+    app.router.add_get("/", handle)
+    runner = web.AppRunner(app)
+    await runner.setup()
+    port = int(os.environ.get("PORT", 10000))
+    site = web.TCPSite(runner, "0.0.0.0", port)
+    await site.start()
+
 async def main():
     await db.init_db()
-    print("Бот MixMoney успешно запущен!")
+    asyncio.create_task(web_server())
+    print("Бот MixMoney успішно запущено!")
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
